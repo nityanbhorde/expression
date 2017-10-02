@@ -13,16 +13,24 @@ server.use(sassMiddleware({
 
 server.set('view engine','ejs');
 
-server.get('/',(req,res)=>{
-	res.render('index', {
-		content: '...'
-	});
+import serverRender from './serverRender';
+
+server.get(['/', '/contest/:contestId'],(req,res)=>{
+	serverRender(req.params.contestId)
+		.then(( { initialMarkup, initialData} ) => {
+			res.render('index', {
+			initialMarkup,
+			initialData
+			});
+		})
+		.catch(console.error)
+			
 })
 
 server.use('/api', apiRouter);
 server.use(express.static('public'));
 
 
-server.listen(config.port,() =>{
+server.listen(config.port, config.host, () =>{
 	console.info('Express listening on port', config.port);
 });
